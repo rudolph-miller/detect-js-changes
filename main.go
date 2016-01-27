@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Rudolph-Miller/detect-js-changes/detect_js_changes"
 	"github.com/codegangsta/cli"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -9,7 +10,14 @@ import (
 )
 
 type Config struct {
-	Urls []string
+	Urls   []string
+	TmpDir string `yaml:"tmp_dir"`
+}
+
+func setDefaultConfig(config *Config) {
+	if config.TmpDir == "" {
+		config.TmpDir = "/tmp"
+	}
 }
 
 func getConfig(file string, env string) *Config {
@@ -21,7 +29,18 @@ func getConfig(file string, env string) *Config {
 		os.Exit(1)
 	}
 	config := parsed[env]
+	setDefaultConfig(&config)
 	return &config
+}
+
+func getDownloadDirs(config *Config) [2]string {
+	tmpDir := config.TmpDir
+	var result [2]string
+	suffixes := [2]string{"1", "2"}
+	for index, suffix := range suffixes {
+		result[index] = tmpDir + "/detect_js_changes_download_" + suffix
+	}
+	return result
 }
 
 func main() {
@@ -71,7 +90,11 @@ func main() {
 			Name:  "reset",
 			Usage: "resets downloaded JS files",
 			Action: func(c *cli.Context) {
-				println("reset downloaded JS files")
+				config := getConfig(configFile, env)
+				dirs := getDownloadDirs(config)
+				for _, dir := range dirs {
+					detect_js_changes.Reset(dir)
+				}
 			},
 		},
 	}
