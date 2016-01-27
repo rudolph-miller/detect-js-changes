@@ -1,0 +1,4 @@
+default:
+  urls:
+  - https://raw.githubusercontent.com/lodash/lodash/4.0.1/dist/lodash.core.min.js
+  - https://raw.githubusercontent.com/lodash/lodash/4.0.0/dist/lodash.core.min.js
