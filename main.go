@@ -91,12 +91,16 @@ func getFileName(index int) string {
 	return "file_" + strconv.Itoa(index)
 }
 
-func formatResult(url string, result bool) string {
-	if result {
+func formatResult(url string, result detect_js_changes.Result) string {
+	switch result {
+	case detect_js_changes.HasSomeChanges:
 		return url + " has some changes"
-	} else {
+	case detect_js_changes.HasNoChanges:
 		return url + " has no changes"
+	case detect_js_changes.HasIgnoredChanges:
+		return url + " has ignored changes"
 	}
+	return ""
 }
 
 func main() {
@@ -152,11 +156,11 @@ func main() {
 					filename := getFileName(index)
 					file1 := path.Join(dirs[0], filename)
 					file2 := path.Join(dirs[1], filename)
-					hasChange := detect_js_changes.Detect(file1, file2, ignoreKeywords)
-					if hasChange {
+					result := detect_js_changes.Detect(file1, file2, ignoreKeywords)
+					if result == detect_js_changes.HasSomeChanges {
 						hasSomeChange = true
 					}
-					fmt.Println("Result: " + formatResult(url, hasChange))
+					fmt.Println("Result: " + formatResult(url, result))
 				}
 
 				if hasSomeChange {

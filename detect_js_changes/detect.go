@@ -11,6 +11,14 @@ func beautify(src string) *string {
 	return jsbeautifier.BeautifyFile(src, options)
 }
 
+type Result int
+
+const (
+	HasSomeChanges Result = iota
+	HasNoChanges
+	HasIgnoredChanges
+)
+
 func lineDiff(src1, src2 string) []diffmatchpatch.Diff {
 	dmp := diffmatchpatch.New()
 	a, b, c := dmp.DiffLinesToChars(src1, src2)
@@ -19,32 +27,39 @@ func lineDiff(src1, src2 string) []diffmatchpatch.Diff {
 	return result
 }
 
-func isChange(diff diffmatchpatch.Diff, ignoreKeywords []string) bool {
+func isChange(diff diffmatchpatch.Diff, ignoreKeywords []string) Result {
 	switch diff.Type {
 	case diffmatchpatch.DiffEqual:
-		return false
+		return HasNoChanges
 	default:
-		result := true
+		result := HasSomeChanges
 		for _, keyword := range ignoreKeywords {
 			if strings.Contains(diff.Text, keyword) {
-				result = false
+				result = HasIgnoredChanges
 			}
 		}
 		return result
 	}
 }
 
-func Detect(file1 string, file2 string, ignoreKeywords []string) bool {
+func Detect(file1 string, file2 string, ignoreKeywords []string) Result {
 	src1 := beautify(file1)
 	src2 := beautify(file2)
 	diffs := lineDiff(*src1, *src2)
+	hasIgnoredChanges := false
 	for _, diff := range diffs {
 		switch isChange(diff, ignoreKeywords) {
-		case true:
-			return true
-		case false:
+		case HasSomeChanges:
+			return HasSomeChanges
+		case HasNoChanges:
 			continue
+		case HasIgnoredChanges:
+			hasIgnoredChanges = true
 		}
 	}
-	return false
+	if hasIgnoredChanges {
+		return HasIgnoredChanges
+	} else {
+		return HasNoChanges
+	}
 }
