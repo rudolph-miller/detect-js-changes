@@ -201,9 +201,27 @@ func main() {
 			Action: func(c *cli.Context) {
 				config := getConfig(configFile, env)
 				dirs := getDownloadDirs(config)
-				for _, dir := range dirs {
+				args := c.Args()
+				if len(args) > 0 {
+					num, err := strconv.Atoi(args[0])
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					}
+
+					if num < 1 || num > 2 {
+						fmt.Println("Please specify 1 or 2")
+						os.Exit(1)
+					}
+
+					dir := dirs[num-1]
 					detect_js_changes.Reset(dir)
 					fmt.Println("Reset: " + dir)
+				} else {
+					for _, dir := range dirs {
+						detect_js_changes.Reset(dir)
+						fmt.Println("Reset: " + dir)
+					}
 				}
 			},
 		},
