@@ -19,6 +19,9 @@ default:
   tmp_dir: ./tmp
   ignore_keywords:
   - sample keyword
+development:
+  ignore_keywords:
+  - hello world
 ```
 
 # Usage
@@ -48,7 +51,39 @@ Detecting: https://raw.githubusercontent.com/lodash/lodash/4.0.0/dist/lodash.cor
 Result: https://raw.githubusercontent.com/lodash/lodash/4.0.0/dist/lodash.core.min.js has no changes
 ```
 
-# Result
+# env
+
+```
+$ detect-js-changes --env development detect
+$ detect-js-changes -e development detect
+$ ENV=development detect-js-changes detect
+```
+
+# reset
+
+```
+$ detect-js-changes reset
+Reset: tmp/detect_js_changes_download_1
+Reset: tmp/detect_js_changes_download_2
+
+$ detect-js-changes reset 1
+Reset: tmp/detect_js_changes_download_1
+
+$ detect-js-changes reset 2
+Reset: tmp/detect_js_changes_download_2
+```
+
+# download
+
+```
+$ detect-js-changes download
+```
+
+# detect
+
+```
+$ detect-js-changes detect
+```
 
 Result has 3 ways below.
 
