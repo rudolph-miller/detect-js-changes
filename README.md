@@ -47,3 +47,13 @@ Result: https://raw.githubusercontent.com/lodash/lodash/4.0.1/dist/lodash.core.m
 Detecting: https://raw.githubusercontent.com/lodash/lodash/4.0.0/dist/lodash.core.min.js
 Result: https://raw.githubusercontent.com/lodash/lodash/4.0.0/dist/lodash.core.min.js has no changes
 ```
+
+# Result
+
+Result has 3 ways below.
+
+```
+Result: URL has some changes
+Result: URL has no changes
+Result: URL has ignored changes
+```
