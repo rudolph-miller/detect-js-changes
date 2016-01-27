@@ -111,6 +111,7 @@ func main() {
 			Name:  "detect",
 			Usage: "detects changes",
 			Action: func(c *cli.Context) {
+				hasSomeChange := false
 				config := getConfig(configFile, env)
 				urls := config.Urls
 				dirs := getDownloadDirs(config)
@@ -133,12 +134,15 @@ func main() {
 					filename := getFileName(index)
 					file1 := path.Join(dirs[0], filename)
 					file2 := path.Join(dirs[1], filename)
-					result, err := detect_js_changes.Detect(file1, file2, ignoreKeywords)
-					if err != nil {
-						fmt.Println(err)
-						os.Exit(1)
+					hasChange := detect_js_changes.Detect(file1, file2, ignoreKeywords)
+					if hasChange {
+						hasSomeChange = true
 					}
-					fmt.Println("Result: " + formatResult(url, result))
+					fmt.Println("Result: " + formatResult(url, hasChange))
+				}
+
+				if hasSomeChange {
+					os.Exit(1)
 				}
 			},
 		},
