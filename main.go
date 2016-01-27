@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"path"
 )
 
 type Config struct {
@@ -38,7 +39,7 @@ func getDownloadDirs(config *Config) [2]string {
 	var result [2]string
 	suffixes := [2]string{"1", "2"}
 	for index, suffix := range suffixes {
-		dir := tmpDir + "/detect_js_changes_download_" + suffix
+		dir := path.Join(tmpDir, "detect_js_changes_download_"+suffix)
 		result[index] = dir
 		os.MkdirAll(dir, 0777)
 	}
