@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Rudolph-Miller/detect-js-changes/detect_js_changes"
 	"github.com/codegangsta/cli"
@@ -8,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strconv"
 )
 
 type Config struct {
@@ -44,6 +46,26 @@ func getDownloadDirs(config *Config) [2]string {
 		os.MkdirAll(dir, 0777)
 	}
 	return result
+}
+
+func getAvailableDir(dirs [2]string) (string, error) {
+	var result string
+	for _, dir := range dirs {
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return result, err
+		}
+		if len(files) == 0 {
+			result = dir
+			break
+		}
+	}
+	if result != "" {
+		return result, nil
+	} else {
+		msg := "No available directory\nPleaze reset"
+		return result, errors.New(msg)
+	}
 }
 
 func main() {
@@ -86,8 +108,23 @@ func main() {
 				config := getConfig(configFile, env)
 				urls := config.Urls
 				dirs := getDownloadDirs(config)
-				for _, url := range urls {
-					detect_js_changes.Download(url, dirs[0])
+				dir, err := getAvailableDir(dirs)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+				fmt.Println("Directory: " + dir)
+				for index, url := range urls {
+					file := "file_" + strconv.Itoa(index)
+					destination := path.Join(dir, file)
+					err := detect_js_changes.Download(url, destination)
+					if err != nil {
+						fmt.Println("Download error")
+						fmt.Println(err)
+						os.Exit(1)
+					}
+					msg := "Download: " + url + " as " + file
+					fmt.Println(msg)
 				}
 			},
 		},
