@@ -84,8 +84,10 @@ func main() {
 			Action: func(c *cli.Context) {
 				config := getConfig(configFile, env)
 				urls := config.Urls
-				println(urls)
-				println("download JS files")
+				dirs := getDownloadDirs(config)
+				for _, url := range urls {
+					detect_js_changes.Download(url, dirs[0])
+				}
 			},
 		},
 		{
