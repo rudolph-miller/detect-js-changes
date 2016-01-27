@@ -3,6 +3,7 @@ package detect_js_changes
 import (
 	"fmt"
 	"os"
+	"path"
 )
 
 func Reset(dir string) {
@@ -13,15 +14,13 @@ func Reset(dir string) {
 	}
 	defer d.Close()
 
-	files, err := d.Readdir(-1)
+	files, err := d.Readdirnames(-1)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	for _, file := range files {
-		if file.Mode().IsRegular() {
-			os.Remove("file.Name()")
-		}
+		os.Remove(path.Join(dir, file))
 	}
 }
