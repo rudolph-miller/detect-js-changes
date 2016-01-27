@@ -38,7 +38,9 @@ func getDownloadDirs(config *Config) [2]string {
 	var result [2]string
 	suffixes := [2]string{"1", "2"}
 	for index, suffix := range suffixes {
-		result[index] = tmpDir + "/detect_js_changes_download_" + suffix
+		dir := tmpDir + "/detect_js_changes_download_" + suffix
+		result[index] = dir
+		os.MkdirAll(dir, 0777)
 	}
 	return result
 }
@@ -94,6 +96,7 @@ func main() {
 				dirs := getDownloadDirs(config)
 				for _, dir := range dirs {
 					detect_js_changes.Reset(dir)
+					fmt.Println("Reset: " + dir)
 				}
 			},
 		},
