@@ -13,8 +13,9 @@ import (
 )
 
 type Config struct {
-	Urls   []string
-	TmpDir string `yaml:"tmp_dir"`
+	Urls           []string
+	TmpDir         string   `yaml:"tmp_dir"`
+	IgnoreKeywords []string `yaml:"ignore_keywords"`
 }
 
 func setDefaultConfig(config *Config) {
