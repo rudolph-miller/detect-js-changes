@@ -152,17 +152,25 @@ func main() {
 					}
 				}
 
+				var wg sync.WaitGroup
+
 				for index, url := range urls {
-					fmt.Println("Detecting: " + url)
-					filename := getFileName(index)
-					file1 := path.Join(dirs[0], filename)
-					file2 := path.Join(dirs[1], filename)
-					result := detect_js_changes.Detect(file1, file2, ignoreKeywords)
-					if result == detect_js_changes.HasSomeChanges {
-						hasSomeChange = true
-					}
-					fmt.Println("Result: " + formatResult(url, result))
+					wg.Add(1)
+					go func(url string) {
+						fmt.Println("Detecting: " + url)
+						filename := getFileName(index)
+						file1 := path.Join(dirs[0], filename)
+						file2 := path.Join(dirs[1], filename)
+						result := detect_js_changes.Detect(file1, file2, ignoreKeywords)
+						if result == detect_js_changes.HasSomeChanges {
+							hasSomeChange = true
+						}
+						fmt.Println("Result: " + formatResult(url, result))
+						wg.Done()
+					}(url)
 				}
+
+				wg.Wait()
 
 				if hasSomeChange {
 					os.Exit(1)
