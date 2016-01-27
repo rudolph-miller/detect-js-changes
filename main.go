@@ -73,6 +73,14 @@ func getFileName(index int) string {
 	return "file_" + strconv.Itoa(index)
 }
 
+func formatResult(url string, result bool) string {
+	if result {
+		return url + " has some changes"
+	} else {
+		return url + " has no changes"
+	}
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "detect-js-changes"
@@ -106,6 +114,7 @@ func main() {
 				config := getConfig(configFile, env)
 				urls := config.Urls
 				dirs := getDownloadDirs(config)
+				ignoreKeywords := config.IgnoreKeywords
 				for _, dir := range dirs {
 					files, err := ioutil.ReadDir(dir)
 					if err != nil {
@@ -120,16 +129,16 @@ func main() {
 				}
 
 				for index, url := range urls {
+					fmt.Println("Detecting: " + url)
 					filename := getFileName(index)
 					file1 := path.Join(dirs[0], filename)
 					file2 := path.Join(dirs[1], filename)
-					result, err := detect_js_changes.Detect(file1, file2)
+					result, err := detect_js_changes.Detect(file1, file2, ignoreKeywords)
 					if err != nil {
 						fmt.Println(err)
 						os.Exit(1)
 					}
-					fmt.Println("Detecting: " + url)
-					fmt.Println(result)
+					fmt.Println("Result: " + formatResult(url, result))
 				}
 			},
 		},

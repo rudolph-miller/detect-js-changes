@@ -4,9 +4,9 @@ import (
 	"errors"
 )
 
-func Detect(file1 string, file2 string) (string, error) {
+func Detect(file1 string, file2 string, ignoreKeywords []string) (bool, error) {
 	if false {
-		return "", errors.New("Error")
+		return false, errors.New("Error")
 	}
-	return "result", nil
+	return false, nil
 }
