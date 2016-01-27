@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"sync"
 )
 
 type Config struct {
@@ -181,18 +182,27 @@ func main() {
 					os.Exit(1)
 				}
 				fmt.Println("Directory: " + dir)
+
+				var wg sync.WaitGroup
+
 				for index, url := range urls {
 					file := getFileName(index)
 					destination := path.Join(dir, file)
-					err := detect_js_changes.Download(url, destination)
-					if err != nil {
-						fmt.Println("Download error")
-						fmt.Println(err)
-						os.Exit(1)
-					}
-					msg := "Download: " + url + " as " + file
-					fmt.Println(msg)
+					wg.Add(1)
+
+					go func(url string) {
+						err := detect_js_changes.Download(url, destination)
+						if err != nil {
+							fmt.Println("Download error")
+							fmt.Println(err)
+							os.Exit(1)
+						}
+						msg := "Download: " + url + " as " + file
+						fmt.Println(msg)
+						wg.Done()
+					}(url)
 				}
+				wg.Wait()
 			},
 		},
 		{
