@@ -68,6 +68,10 @@ func getAvailableDir(dirs [2]string) (string, error) {
 	}
 }
 
+func getFileName(index int) string {
+	return "file_" + strconv.Itoa(index)
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "detect-js-changes"
@@ -98,7 +102,34 @@ func main() {
 			Name:  "detect",
 			Usage: "detects changes",
 			Action: func(c *cli.Context) {
-				println("detect changes")
+				config := getConfig(configFile, env)
+				urls := config.Urls
+				dirs := getDownloadDirs(config)
+				for _, dir := range dirs {
+					files, err := ioutil.ReadDir(dir)
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					}
+
+					if len(files) == 0 {
+						fmt.Println("Please execute download twice")
+						os.Exit(1)
+					}
+				}
+
+				for index, url := range urls {
+					filename := getFileName(index)
+					file1 := path.Join(dirs[0], filename)
+					file2 := path.Join(dirs[1], filename)
+					result, err := detect_js_changes.Detect(file1, file2)
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					}
+					fmt.Println("Detecting: " + url)
+					fmt.Println(result)
+				}
 			},
 		},
 		{
@@ -115,7 +146,7 @@ func main() {
 				}
 				fmt.Println("Directory: " + dir)
 				for index, url := range urls {
-					file := "file_" + strconv.Itoa(index)
+					file := getFileName(index)
 					destination := path.Join(dir, file)
 					err := detect_js_changes.Download(url, destination)
 					if err != nil {
