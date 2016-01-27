@@ -5,3 +5,6 @@ default:
   tmp_dir: ./tmp
   ignore_keywords:
   - sample keyword
+development:
+  ignore_keywords:
+  - hello world

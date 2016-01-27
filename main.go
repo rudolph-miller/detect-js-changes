@@ -18,9 +18,23 @@ type Config struct {
 	IgnoreKeywords []string `yaml:"ignore_keywords"`
 }
 
-func setDefaultConfig(config *Config) {
+func setDefaultValue(config *Config) {
 	if config.TmpDir == "" {
 		config.TmpDir = "/tmp"
+	}
+}
+
+func mergeDefaultConfig(config *Config, defaultConfig *Config) {
+	if len(config.Urls) == 0 {
+		config.Urls = defaultConfig.Urls
+	}
+
+	if config.TmpDir == "" {
+		config.TmpDir = defaultConfig.TmpDir
+	}
+
+	if len(config.IgnoreKeywords) == 0 {
+		config.IgnoreKeywords = defaultConfig.IgnoreKeywords
 	}
 }
 
@@ -33,7 +47,11 @@ func getConfig(file string, env string) *Config {
 		os.Exit(1)
 	}
 	config := parsed[env]
-	setDefaultConfig(&config)
+	if env != "default" {
+		defaultConfig := parsed["default"]
+		mergeDefaultConfig(&config, &defaultConfig)
+	}
+	setDefaultValue(&config)
 	return &config
 }
 
